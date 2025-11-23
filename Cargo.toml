@@ -1,8 +1,54 @@
+# cargo-features = ["codegen-backend", "profile-rustflags", "trim-paths"]
+cargo-features = ["profile-rustflags", "trim-paths"]
+
 [package]
-name = "RTSHybrid"
+name    = "RTSHybrid"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bevy = "0.16"
+bevy   = "0.16"
 chrono = "0.4.42"
+
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3
+# codegen-backend = "llvm"
+
+# Enable a small amount of optimization in the dev profile.
+[profile.dev]
+opt-level = 1
+# codegen-backend = "cranelift"
+debug            = "line-tables-only"
+debug-assertions = true
+overflow-checks  = true
+strip            = "none"             # true | false | "none" | "symbols" | "debuginfo" ## Leave off @ w. THIS IS NOT OBFUSCATION.
+panic            = "abort"            # "unwind" | "abort"
+lto              = "thin"             # "false" ### # true | false | "off" | "thin" | "fat" ## Can't use with cranelift yet
+trim-paths       = "none"
+# tune-cpu         = "native"
+
+# Enable more optimization in the release profile at the cost of compile time.
+[profile.release]
+# Compile the entire crate as one unit.
+# Slows compile times, marginal improvements.
+codegen-units = 1
+# Do a second optimization pass over the entire program, including dependencies.
+# Slows compile times, marginal improvements.
+debug-assertions = false
+overflow-checks  = false                     # debatable
+strip            = "symbols"                 # true | false | "none" | "symbols" | "debuginfo" ## Leave off @ w. THIS IS NOT OBFUSCATION.
+panic            = "unwind"
+lto              = "thin"                    # true | false | "off" | "thin" | "fat" ## Can't use with cranelift yet
+trim-paths       = ["diagnostics", "object"]
+
+# Optimize for size in the wasm-release profile to reduce load times and bandwidth usage on web.
+[profile.wasm-release]
+# Default to release profile values.
+inherits = "release"
+# Optimize with size in mind (also try "z", sometimes it is better).
+# Slightly slows compile times, great improvements to file size and runtime performance.
+opt-level = "s"
+# Strip all debugging information from the binary to slightly reduce file size.
+strip = "debuginfo"

@@ -2,7 +2,7 @@
 cargo-features = ["profile-rustflags", "trim-paths"]
 
 [package]
-name    = "RTSHybrid"
+name    = "rts_hybrid"
 version = "0.1.0"
 edition = "2024"
 

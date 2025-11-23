@@ -1,3 +1,4 @@
+
 = Pitch
 
 
@@ -6,3 +7,7 @@
 + Real time strategy
 + GOAP
 + macro heavy (micro minimum)
+
++
+
+

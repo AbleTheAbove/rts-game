@@ -18,8 +18,16 @@ pub fn screenshot_on_spacebar(mut commands: Commands, input: Res<ButtonInput<Key
 
     let local: DateTime<Local> = Local::now();
 
+    let mut path = assets_path().expect("Failed to get assets path");
+    path.push("local");
+
+    if !path.exists() {
+        std::fs::create_dir_all(&path).expect("Failed to create assets/local directory");
+    }
+
     let time_fmt = format!(
-        "./assets/local/screenshot-{}-{}-{}-{}-{}-{}-{}.png",
+        "{}/screenshot-{}-{}-{}-{}-{}-{}-{}.png",
+        path.to_str().unwrap(),
         local.year(),
         local.month(),
         local.day(),
@@ -36,6 +44,25 @@ pub fn screenshot_on_spacebar(mut commands: Commands, input: Res<ButtonInput<Key
             .observe(save_to_disk(path));
     }
 }
+
+fn assets_path() -> Result<std::path::PathBuf, String> {
+    let mut path = current_path()?;
+    path.push("assets");
+    Ok(path)
+}
+
+#[allow(dead_code)]
+#[cfg(not(debug_assertions))]
+fn current_path() -> Result<std::path::PathBuf, String> {
+    std::env::current_exe().map_err(|e| e.to_string())
+}
+
+#[allow(dead_code)]
+#[cfg(debug_assertions)]
+fn current_path() -> Result<std::path::PathBuf, String> {
+    std::env::current_dir().map_err(|e| e.to_string())
+}
+
 pub fn screenshot_saving(
     mut commands: Commands,
     screenshot_saving: Query<Entity, With<Capturing>>,

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 pub mod dbg;
+pub mod init;
 
 fn main() {
     App::new()
